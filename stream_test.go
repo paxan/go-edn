@@ -6,8 +6,8 @@ package edn
 import (
 	"bytes"
 	. "gopkg.in/check.v1"
-	str "strings"
 	"io/ioutil"
+	str "strings"
 	"testing"
 )
 

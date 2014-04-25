@@ -4,10 +4,11 @@
 package edn
 
 import (
-	. "gopkg.in/check.v1"
-	"fmt"
-	"time"
+	"code.google.com/p/go-uuid/uuid"
 	"container/list"
+	"fmt"
+	. "gopkg.in/check.v1"
+	"time"
 )
 
 type EncodeTests struct{}
@@ -45,6 +46,9 @@ func (*EncodeTests) TestPrimitives(c *C) {
 	aTime := time.Date(2014, 3, 14, 15, 59, 59, 123456789, utc)
 	aTimePtr := &aTime
 	var nilTimePtr *time.Time
+	aUuid := uuid.Parse("7594599c-2df6-412f-8ca0-8ef31448d923")
+	aUuidPtr := &aUuid
+	var nilUuidPtr *uuid.UUID
 	checkMarshal(
 		c,
 		// literal nil
@@ -82,6 +86,10 @@ func (*EncodeTests) TestPrimitives(c *C) {
 		pair{aTime, `#inst "2014-03-14T15:59:59.123456789Z"`},
 		pair{aTimePtr, `#inst "2014-03-14T15:59:59.123456789Z"`},
 		pair{nilTimePtr, "nil"},
+		// uuid.UUID
+		pair{aUuid, `#uuid "7594599c-2df6-412f-8ca0-8ef31448d923"`},
+		pair{aUuidPtr, `#uuid "7594599c-2df6-412f-8ca0-8ef31448d923"`},
+		pair{nilUuidPtr, "nil"},
 	)
 }
 
@@ -95,7 +103,7 @@ func (*EncodeTests) TestMaps(c *C) {
 			ednMap{
 				"x": -42,
 				K("y"): ednMap{
-					1: S("foo"),
+					1:   S("foo"),
 					nil: map[bool]float32{true: 0.1, false: 3.14},
 				},
 			}, `{"x" -42, :y {1 foo, nil {true 0.1, false 3.14}}}`,

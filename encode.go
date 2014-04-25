@@ -10,6 +10,8 @@ package edn
 
 import (
 	"bytes"
+	"code.google.com/p/go-uuid/uuid"
+	"container/list"
 	"encoding"
 	"encoding/base64"
 	"fmt"
@@ -17,10 +19,9 @@ import (
 	"reflect"
 	"runtime"
 	"strconv"
-	"sync"
 	"strings"
+	"sync"
 	"time"
-	"container/list"
 )
 
 // Marshal returns the EDN encoding of v.
@@ -159,6 +160,7 @@ var (
 	timeType          = reflect.TypeOf(time.Time{})
 	textMarshalerType = reflect.TypeOf(new(encoding.TextMarshaler)).Elem()
 	listType          = reflect.TypeOf(list.List{})
+	uuidType          = reflect.TypeOf(uuid.UUID{})
 )
 
 // newTypeEncoder constructs an encoderFunc for a type.
@@ -374,6 +376,11 @@ func encodeByteSlice(e *encodeState, v reflect.Value) {
 	e.WriteByte('"')
 }
 
+func encodeUuid(e *encodeState, v reflect.Value) {
+	e.WriteString("#uuid ")
+	e.string(uuid.UUID(v.Bytes()).String())
+}
+
 // sliceEncoder just wraps an arrayEncoder, checking to make sure the value isn't nil.
 type sliceEncoder struct {
 	arrayEnc encoderFunc
@@ -390,6 +397,9 @@ func (se *sliceEncoder) encode(e *encodeState, v reflect.Value) {
 func newSliceEncoder(t reflect.Type) encoderFunc {
 	// Byte slices get special treatment; arrays don't.
 	if t.Elem().Kind() == reflect.Uint8 {
+		if t == uuidType {
+			return encodeUuid
+		}
 		return encodeByteSlice
 	}
 	enc := &sliceEncoder{newArrayEncoder(t)}

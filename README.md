@@ -6,6 +6,7 @@ Go's excellent `encoding/json` package.
 [![GoDoc](https://godoc.org/github.com/paxan/go-edn?status.png)](https://godoc.org/github.com/paxan/go-edn)
 
 **Warning:** currently, it supports the following:
+
  * `Marshal` function that encodes a Go value into EDN.
  * `TextMarshaler`-implementing objects can be marshaled.
  * `Encoder` for writing EDN objects to an output stream.
@@ -24,7 +25,9 @@ will need to be improved, and **will certainly change.**
 
 ## Bytes
 
-Go `[]byte` objects will be serialized like so: `#base64 "..."`. For example,
-`#base64 "YW55ICsgb2xkICYgZGF0YQ=="` **Note:** I've taken a liberty here,
-and chose `#base64` tag. This may change to something else when EDN spec
-gets updated to accomdate byte array objects.
+Go `[]byte` objects will be serialized like so:
+
+    #base64 "YW55ICsgb2xkICYgZGF0YQ=="
+
+**Note:** I've taken a liberty here, and chose `#base64` tag. This may change
+to something else when EDN spec gets updated to accommodate byte array objects.

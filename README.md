@@ -3,6 +3,8 @@
 This [EDN][edn] encoding/decoding package is inspired and remixed from
 Go's excellent `encoding/json` package.
 
+[![GoDoc](https://godoc.org/github.com/paxan/go-edn?status.png)](https://godoc.org/github.com/paxan/go-edn)
+
 **Warning:** currently, it supports the following:
  * `Marshal` function that encodes a Go value into EDN.
  * `TextMarshaler`-implementing objects can be marshaled.

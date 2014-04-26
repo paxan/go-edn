@@ -38,6 +38,15 @@ func Marshal(v interface{}) ([]byte, error) {
 	return e.Bytes(), nil
 }
 
+// MustMarshal is a panicky version of Marshal.
+func MustMarshal(v interface{}) []byte {
+	if data, err := Marshal(v); err == nil {
+		return data
+	} else {
+		panic(err)
+	}
+}
+
 // An UnsupportedTypeError is returned by Marshal when attempting
 // to encode an unsupported value type.
 type UnsupportedTypeError struct {

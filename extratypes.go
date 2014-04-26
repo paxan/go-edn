@@ -42,3 +42,9 @@ var symbolType = reflect.TypeOf(Symbol(""))
 func S(s string) Symbol {
 	return Symbol(s)
 }
+
+// KMap is useful for generating EDN maps with Keywords as keys.
+// For example: Marshal(KMap{"foo": 45, "bar": 3.14}) => {:foo 45, :bar 3.14}
+type KMap map[string]interface{}
+
+var keywordMapType = reflect.TypeOf(KMap{})

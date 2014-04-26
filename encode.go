@@ -325,6 +325,7 @@ type mapEncoder struct {
 
 func (me *mapEncoder) encode(e *encodeState, v reflect.Value) {
 	isSet := v.Type() == setType
+	isKMap := v.Type() == keywordMapType
 	sep := ", "
 	if isSet {
 		e.WriteByte('#')
@@ -339,7 +340,11 @@ func (me *mapEncoder) encode(e *encodeState, v reflect.Value) {
 		if i > 0 {
 			e.WriteString(sep)
 		}
-		me.keyEnc(e, k)
+		if !isKMap {
+			me.keyEnc(e, k)
+		} else{
+			me.keyEnc(e, reflect.ValueOf(Keyword(k.String())))
+		}
 		if !isSet {
 			e.WriteByte(' ')
 			me.elemEnc(e, v.MapIndex(k))

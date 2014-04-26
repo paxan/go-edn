@@ -25,3 +25,11 @@ func (*ExtraTypesTests) TestK(c *C) {
 	c.Check(string(K("abc")), Equals, "abc")
 	c.Check(string(K(":foo/abc")), Equals, ":foo/abc")
 }
+
+func (*ExtraTypesTests) TestKMap(c *C) {
+	if b, err := Marshal(KMap{"foo": 123, "bar": true}); err == nil {
+		c.Assert(string(b), Equals, "{:foo 123, :bar true}")
+	} else {
+		c.Fatal(err)
+	}
+}

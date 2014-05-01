@@ -8,7 +8,9 @@ import (
 	"container/list"
 	"fmt"
 	. "gopkg.in/check.v1"
+	"testing/quick"
 	"time"
+	"unicode/utf8"
 )
 
 type EncodeTests struct{}
@@ -74,6 +76,7 @@ func (*EncodeTests) TestPrimitives(c *C) {
 		pair{float64(3.14E+250), "3.14e+250"},
 		// reflect.String
 		pair{`Russian for hello is "привет".`, `"Russian for hello is \"привет\"."`},
+		pair{"Not really UTF-8: Espa\xf1a", "\"Not really UTF-8: Espa\ufffda\""},
 		// edn.Keyword
 		pair{K("foo/bar"), ":foo/bar"},
 		pair{K(":wow"), ":wow"},
@@ -91,6 +94,28 @@ func (*EncodeTests) TestPrimitives(c *C) {
 		pair{aUuidPtr, `#uuid "7594599c-2df6-412f-8ca0-8ef31448d923"`},
 		pair{nilUuidPtr, "nil"},
 	)
+}
+
+func (*EncodeTests) TestEnsureUtf8(c *C) {
+	f1 := func(x string) bool {
+		r := ensureUtf8(x)
+		if utf8.ValidString(x) {
+			return x == r
+		} else {
+			return utf8.ValidString(r)
+		}
+	}
+	f2 := func(b []byte) bool {
+		x := string(b)
+		r := ensureUtf8(x)
+		if utf8.ValidString(x) {
+			return x == r
+		} else {
+			return utf8.ValidString(r)
+		}
+	}
+	c.Check(quick.Check(f1, nil), IsNil)
+	c.Check(quick.Check(f2, nil), IsNil)
 }
 
 func (*EncodeTests) TestMaps(c *C) {

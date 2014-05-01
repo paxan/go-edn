@@ -22,6 +22,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 // Marshal returns the EDN encoding of v.
@@ -105,9 +106,41 @@ func (e *encodeState) reflectValue(v reflect.Value) {
 	valueEncoder(v)(e, v)
 }
 
+// ensureUtf8 produces a valid utf-8 encoded string. In case its input is
+// invalid, all bad characters are replaced with \ufffd (aka "error"
+// rune).
+func ensureUtf8(s string) string {
+	if utf8.ValidString(s) {
+		return s
+	}
+	buf := bytes.Buffer{}
+	start := 0
+	for i := 0; i < len(s); {
+		if s[i] < utf8.RuneSelf {
+			i++
+			continue
+		}
+		c, size := utf8.DecodeRuneInString(s[i:])
+		if c == utf8.RuneError && size == 1 {
+			if start < i {
+				buf.WriteString(s[start:i])
+			}
+			buf.WriteRune(utf8.RuneError)
+			i++
+			start = i
+			continue
+		}
+		i += size
+	}
+	if start < len(s) {
+		buf.WriteString(s[start:])
+	}
+	return buf.String()
+}
+
 func (e *encodeState) string(s string) (int, error) {
 	len0 := e.Len()
-	e.WriteString(fmt.Sprintf("%#v", s))
+	e.WriteString(fmt.Sprintf("%q", ensureUtf8(s)))
 	return e.Len() - len0, nil
 }
 
@@ -351,7 +384,7 @@ func (me *mapEncoder) encode(e *encodeState, v reflect.Value) {
 		}
 		if !isKMap {
 			me.keyEnc(e, k)
-		} else{
+		} else {
 			me.keyEnc(e, reflect.ValueOf(Keyword(k.String())))
 		}
 		if !isSet {

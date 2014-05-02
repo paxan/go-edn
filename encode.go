@@ -140,7 +140,9 @@ func ensureUtf8(s string) string {
 
 func (e *encodeState) string(s string) (int, error) {
 	len0 := e.Len()
-	e.WriteString(fmt.Sprintf("%q", ensureUtf8(s)))
+	// Quote approximates Java/Clojure string literal representation,
+	// but not quite. TODO: follow Java spec exactly.
+	e.WriteString(strconv.Quote(ensureUtf8(s)))
 	return e.Len() - len0, nil
 }
 

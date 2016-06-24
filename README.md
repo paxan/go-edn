@@ -1,3 +1,9 @@
+# Deprecation Notice
+
+This is dead code. A more complete implementation is:
+
+[github.com/go-edn/edn](https://github.com/go-edn/edn)
+
 # Package edn
 
 This [EDN][edn] encoding/decoding package is inspired and remixed from
